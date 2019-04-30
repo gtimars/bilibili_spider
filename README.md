@@ -1,6 +1,6 @@
-#*Bilibili爬虫*
+#**Bilibili爬虫**
 爬取B站的视频信息，爬取时通过解析到的up主id号同时进行对up主信息的爬取
-##*说明*
+##**说明**
 - 使用httpclient下载网页，解析json页面后可以存储在Hbase或elasticsearch中
 - 使用了多线程抓取，通过redis存储视频号实现分布式
 - 使用阿布云代理
