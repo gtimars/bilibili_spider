@@ -11,7 +11,7 @@ import com.gtj.spider.entity.VideoPage;
  */
 public interface IProcessPage {
     //解析视频页面
-    void processVideoPage(VideoPage page);
+    void processVideoPage(VideoPage page,String videoId);
     //解析用户页面
     void processUserPage(UserPage page);
 }
