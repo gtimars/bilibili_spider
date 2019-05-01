@@ -15,7 +15,7 @@ import java.util.HashMap;
  */
 public class ESUtil {
 
-    TransportClient client = null;
+    private static TransportClient client = null;
 
     public ESUtil() {
         //构建Client
@@ -54,10 +54,5 @@ public class ESUtil {
      */
     public void searchIndex(String index, String type, String id) {
         GetResponse response = client.prepareGet(index,type,id).get();
-    }
-
-    public static void main(String[] args) {
-        ESUtil esUtil = new ESUtil();
-        //esUtil.createEmployee();
     }
 }
