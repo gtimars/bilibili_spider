@@ -21,41 +21,46 @@ public class JsonProcessPageImpl implements IProcessPage{
     private static Logger log = LoggerFactory.getLogger(JsonProcessPageImpl.class);
 
     @Override
-    public void processVideoPage(VideoPage page) {
+    public void processVideoPage(VideoPage page, String videoId) {
         String content = page.getContent();
         JSONObject info = JSONObject.parseObject(content);
         //判断视频信息是否存在
-        page.setMessage(info.getString("message"));
-        if(page.getMessage().equals("0")) {
-            String data = info.getString("data");
-            JSONObject data_json = JSONObject.parseObject(data);
+        try {
+            page.setMessage(info.getString("message"));
+            if(page.getMessage().equals("0")) {
+                String data = info.getString("data");
+                JSONObject data_json = JSONObject.parseObject(data);
 
-            //视频信息
-            page.setTitle(data_json.getString("title"));
-            page.setAid(data_json.getString("aid"));
-            page.setPubdate(DateUtil.secondTotime(data_json.getString("pubdate")));
-            page.setDesc(data_json.getString("desc"));
-            page.setTname(data_json.getString("tname"));
+                //视频信息
+                page.setTitle(data_json.getString("title"));
+                page.setAid(data_json.getString("aid"));
+                page.setPubdate(DateUtil.secondTotime(data_json.getString("pubdate")));
+                page.setDesc(data_json.getString("desc"));
+                page.setTname(data_json.getString("tname"));
 
-            //获取up主信息
-            String owner = data_json.getString("owner");
-            JSONObject owner_json = JSONObject.parseObject(owner);
-            page.setMid(owner_json.getString("mid"));
-            page.setAuthor(owner_json.getString("name"));
+                //获取up主信息
+                String owner = data_json.getString("owner");
+                JSONObject owner_json = JSONObject.parseObject(owner);
+                page.setMid(owner_json.getString("mid"));
+                page.setAuthor(owner_json.getString("name"));
 
-            //获取视频热度信息
-            String stat = data_json.getString("stat");
-            JSONObject stat_json = JSONObject.parseObject(stat);
-            page.setCoin(stat_json.getString("coin"));
-            page.setFavorite(stat_json.getString("favorite"));
-            page.setShare(stat_json.getString("share"));
-            page.setLike(stat_json.getString("like"));
-            page.setReply(stat_json.getString("reply"));
-            page.setDanmaku(stat_json.getString("danmaku"));
-            page.setView(stat_json.getString("view"));
+                //获取视频热度信息
+                String stat = data_json.getString("stat");
+                JSONObject stat_json = JSONObject.parseObject(stat);
+                page.setCoin(stat_json.getString("coin"));
+                page.setFavorite(stat_json.getString("favorite"));
+                page.setShare(stat_json.getString("share"));
+                page.setLike(stat_json.getString("like"));
+                page.setReply(stat_json.getString("reply"));
+                page.setDanmaku(stat_json.getString("danmaku"));
+                page.setView(stat_json.getString("view"));
 
-            log.info("视频{}解析完毕！",page.getAid());
+                log.info("视频{}解析完毕！",page.getAid());
+            }
+        }catch (Exception e){
+            log.error("视频{}解析失败！",videoId);
         }
+
     }
 
     @Override
