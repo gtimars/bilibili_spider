@@ -19,10 +19,4 @@ public class DateUtil {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         return simpleDateFormat.format(date);
     }
-
-    public static void main(String[] args) {
-        //1555052403    1555049433
-        DateUtil dateUtil = new DateUtil();
-        System.out.println(dateUtil.secondTotime("1555052403"));
-    }
 }
