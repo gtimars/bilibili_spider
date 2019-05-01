@@ -27,6 +27,8 @@ import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+
 
 /**
  * @author gtj
@@ -35,12 +37,12 @@ public class AbuyunHttpclientUtil {
 
     private static Logger log = LoggerFactory.getLogger(AbuyunHttpclientUtil.class);
     // 代理服务器
-    final static String proxyHost = "http-dyn.abuyun.com";
-    final static Integer proxyPort = 9020;
+    private final static String proxyHost = "http-dyn.abuyun.com";
+    private final static Integer proxyPort = 9020;
 
     // 代理隧道验证信息
-    final static String proxyUser = ConfigUtil.getProperties("proxy","proxyUser");
-    final static String proxyPass = ConfigUtil.getProperties("proxy","proxyPass");
+    private final static String proxyUser = ConfigUtil.getProperties("proxy","proxyUser");
+    private final static String proxyPass = ConfigUtil.getProperties("proxy","proxyPass");
 
     private static PoolingHttpClientConnectionManager cm = null;
     private static HttpHost proxy = null;
@@ -75,9 +77,9 @@ public class AbuyunHttpclientUtil {
                 .build();
     }
 
-    public static String doRequest(HttpRequestBase httpReq, String url) {
-        String content = null;
-        CloseableHttpResponse httpResp;
+    private static String doRequest(HttpRequestBase httpReq, String url) {
+        String content;
+        CloseableHttpResponse httpResp = null;
 
         try {
             // JDK 8u111版本后，目标页面为HTTPS协议，启用proxy用户密码鉴权
@@ -106,15 +108,21 @@ public class AbuyunHttpclientUtil {
             return content;
         } catch (Exception e) {
             log.error("下载网页{}出错！",url);
+        } finally {
+            try {
+                if (httpResp != null) {
+                    httpResp.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
-        return content;
+        return null;
     }
 
     /**
      * 设置请求头
-     *
-     * @param httpReq
      */
     private static void setHeaders(HttpRequestBase httpReq) {
         httpReq.setHeader("Accept-Encoding", "gzip, deflate, br");
