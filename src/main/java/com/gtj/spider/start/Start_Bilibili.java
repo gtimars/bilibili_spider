@@ -25,7 +25,7 @@ import java.util.concurrent.Executors;
  */
 public class Start_Bilibili {
 
-    Logger log = LoggerFactory.getLogger(Start_Bilibili.class);
+    private Logger log = LoggerFactory.getLogger(Start_Bilibili.class);
 
     private IPageDownLoad pageDownLoad;
     private IProcessPage processPage;
@@ -33,22 +33,22 @@ public class Start_Bilibili {
     private IRepository repository;
 
     //线程池
-    private ExecutorService threadPool = Executors.newFixedThreadPool(10);
+    private ExecutorService threadPool = Executors.newFixedThreadPool(6);
 
 
-    public void setStorePage(IStorePage storePage) {
+    private void setStorePage(IStorePage storePage) {
         this.storePage = storePage;
     }
 
-    public void setProcessPage(IProcessPage processPage) {
+    private void setProcessPage(IProcessPage processPage) {
         this.processPage = processPage;
     }
 
-    public void setPageDownLoad(IPageDownLoad pageDownLoad) {
+    private void setPageDownLoad(IPageDownLoad pageDownLoad) {
         this.pageDownLoad = pageDownLoad;
     }
 
-    public void setRepository(IRepository repository) {
+    private void setRepository(IRepository repository) {
         this.repository = repository;
     }
 
@@ -58,7 +58,7 @@ public class Start_Bilibili {
      * @param url
      * @return
      */
-    public VideoPage downLoadPage(String url) {
+    private VideoPage downLoadPage(String url) {
         return this.pageDownLoad.downLoadVideoPage(url);
     }
 
@@ -67,8 +67,8 @@ public class Start_Bilibili {
      *
      * @param page
      */
-    public void process(VideoPage page) {
-        this.processPage.processVideoPage(page);
+    private void process(VideoPage page,String videoId) {
+        this.processPage.processVideoPage(page,videoId);
     }
 
     /**
@@ -77,7 +77,7 @@ public class Start_Bilibili {
      * @param userInfoUrl,userStatUrl,upStatUrl,videoNumUrl
      * @return
      */
-    public UserPage downLoadUserPage(String userInfoUrl, String userStatUrl, String upStatUrl, String videoNumUrl) {
+    private UserPage downLoadUserPage(String userInfoUrl, String userStatUrl, String upStatUrl, String videoNumUrl) {
         return this.pageDownLoad.downLoadUserPage(userInfoUrl, userStatUrl, upStatUrl, videoNumUrl);
     }
 
@@ -86,7 +86,7 @@ public class Start_Bilibili {
      *
      * @param page
      */
-    public void processUser(UserPage page) {
+    private void processUser(UserPage page) {
         this.processPage.processUserPage(page);
     }
 
@@ -95,7 +95,7 @@ public class Start_Bilibili {
      *
      * @param page
      */
-    public void storeVideo(VideoPage page) {
+    private void storeVideo(VideoPage page) {
         this.storePage.storeVideo(page);
     }
 
@@ -104,35 +104,37 @@ public class Start_Bilibili {
      *
      * @param page
      */
-    public void storeUser(UserPage page) {
+    private void storeUser(UserPage page) {
         this.storePage.storeUser(page);
     }
 
     /*
     视频信息处理
      */
-    public String getVideoInfo(String videoId) {
+    private String getVideoInfo(String videoId) {
 
         //下载页面
         VideoPage page = downLoadPage(UrlUtil.VIDEO_URL + videoId);
 
+        String mid = null;
         //解析
         if (page != null) {
-            process(page);
+            process(page,videoId);
             if(page.getMessage().equals("0")){
+                mid = page.getMid();
                 //持久化
                 storeVideo(page);
             }else {
                 log.info("视频{}不存在或下架了！", videoId);
             }
         }
-        return page.getMid();
+        return mid;
     }
 
     /*
     用户信息处理
      */
-    public void getUserInfo(String mid) {
+    private void getUserInfo(String mid) {
         //页面下载
         UserPage page = Start_Bilibili.this.downLoadUserPage(UrlUtil.USERINFO_URL + mid,
                 UrlUtil.USERSTAT_URL + mid, UrlUtil.UPSTAT_URL + mid,
@@ -147,7 +149,7 @@ public class Start_Bilibili {
     /**
      * 启动爬虫
      */
-    public void run(){
+    private void run(){
         while (true) {
             //从redis仓库中获取视频id
             final String videoId = repository.pollVideo();
